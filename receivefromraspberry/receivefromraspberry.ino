@@ -7,28 +7,29 @@ byte slave_address = 7;
 long positions[2];
 int counter = 0;
 // Pulses D3, direction D4, Enable D5
-AccelStepper stepper1(5, 3, 4); //degree motor
-AccelStepper stepper2(AccelStepper::FULL4WIRE, 8, 9, 10, 11); //radius motor
+AccelStepper stepper1(1,3, 4); //degree motor
+//AccelStepper stepper2(AccelStepper::FULL4WIRE, 8, 9, 10, 11); //radius motor
 
 void setup() {
   Wire.begin(slave_address);
   Wire.onReceive(receiveEvent);
-  Serial.begin(9600);
+  Serial.begin(9600);  
 
-  stepper1.setMaxSpeed(100);
-  stepper2.setMaxSpeed(100);
-  stepper1.setAcceleration(20);
-  stepper2.setAcceleration(20);
+  stepper1.setMaxSpeed(30000);
+ // stepper2.setMaxSpeed(100);
+  stepper1.setAcceleration(1500);
+ // stepper2.setAcceleration(20);
 }
 
 void loop() {
-  if (counter % 2 == 0) {
-
+  //if (counter % 2 == 0) {
       //probably needs to add some factor, maybe steps for one whole rotation
       
-      stepper1.moveTo(positions[0]);
-      stepper2.moveTo(positions[1]);
-    }
+      stepper1.moveTo(positions[0]); //set distance
+      while (stepper1.distanceToGo() > 0) {
+          stepper1.run();
+      }
+   // }
 }
 
 void receiveEvent(int howMany) {
@@ -48,5 +49,5 @@ void receiveEvent(int howMany) {
   if (b == 1) { //radius
     positions[1] = atoi(str);
     }
-  Serial.println(counter);
+  Serial.println(positions[0]);
 }
