@@ -6,7 +6,8 @@
 byte slave_address = 7;
 long positions[2];
 int counter = 0;
-AccelStepper stepper1(AccelStepper::FULL4WIRE, 2, 3, 4, 5); //degree motor
+// Pulses D3, direction D4, Enable D5
+AccelStepper stepper1(5, 3, 4); //degree motor
 AccelStepper stepper2(AccelStepper::FULL4WIRE, 8, 9, 10, 11); //radius motor
 
 void setup() {
