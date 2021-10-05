@@ -2,6 +2,8 @@
 #include <string.h>
 #include <AccelStepper.h>
 #include <EnableInterrupt.h> 
+#include <stdio.h>
+#include <stdlib.h>
 
 #define encoderA 5
 #define encoderB 6
@@ -10,6 +12,7 @@
 byte slave_address = 7;
 long positions[2];
 int counter = 0;
+float encoderFactor = 2.7777;
 
 volatile int countA = 0;
 volatile int countB = 0;
@@ -22,7 +25,7 @@ int Dir = 0;  // 1 = CW
               
 // Pulses D3, direction D4, Enable D5
 AccelStepper rotor(1, 3, 4); //degree motor
-AccelStepper radius(1, 5, 6); //radius motor
+AccelStepper radius(1, 8, 9); //radius motor
 
 void setup() {
   Wire.begin(slave_address);
@@ -30,9 +33,9 @@ void setup() {
   Serial.begin(9600);  
 
   rotor.setMaxSpeed(30000);
- // stepper2.setMaxSpeed(100);
+  radius.setMaxSpeed(30000);
   rotor.setAcceleration(1500);
- // stepper2.setAcceleration(20);
+  radius.setAcceleration(1500);
 
   pinMode(encoderA, INPUT_PULLUP);
   pinMode(encoderB, INPUT_PULLUP);
@@ -59,10 +62,19 @@ void loop() {
  * moves bot in angle direction
  */
 void moveRotor(int angle) {
+  cumulativeCountA = 0;
   rotor.moveTo(angle); //set distance
-      while (rotor.distanceToGo() > 0) {
+      while (angle - (abs(cumulativeCountA)/encoderFactor) > 0) {
           rotor.run();
       }
+  }
+
+void moveRadius() {
+  
+  }
+
+void moveZ() {
+  
   }
 
 /**
@@ -81,12 +93,17 @@ void receiveEvent(int howMany) {
   }
   if (b == 0) { //degree
     positions[0] = atoi(str);
+    moveRotor(positions[0]);
     }
   if (b == 1) { //radius
     positions[1] = atoi(str);
+    moveRadius(positions[1]);
+    }
+  if (b == 2) {
+    positions[2] = atoi(str);
+    moveZ(positions[2]);
     }
   Serial.println(positions[0]);
-  moveRotor(positions[0]);
 }
 
 /*
@@ -94,7 +111,7 @@ void receiveEvent(int howMany) {
  */
 
 void checkDirection(){
-  if(digitalRead(encoderB) ==  HIGH){                             //digitalReadFast() is faster than digitalRead()
+  if(digitalRead(encoderB) ==  HIGH){
     Dir = 1;  
   }
   else if(digitalRead(encoderB) ==  LOW){
