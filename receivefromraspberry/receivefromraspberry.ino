@@ -26,6 +26,7 @@ int Dir = 0;  // 1 = CW
 // Pulses D3, direction D4, Enable D5
 AccelStepper rotor(1, 3, 4); //degree motor
 AccelStepper radius(1, 8, 9); //radius motor
+AccelStepper height(1, 10, 11); //height motor
 
 void setup() {
   Wire.begin(slave_address);
@@ -36,6 +37,8 @@ void setup() {
   radius.setMaxSpeed(30000);
   rotor.setAcceleration(1500);
   radius.setAcceleration(1500);
+  height.setMaxSpeed(30000);
+  height.setAcceleration(1500);
 
   pinMode(encoderA, INPUT_PULLUP);
   pinMode(encoderB, INPUT_PULLUP);
@@ -69,12 +72,18 @@ void moveRotor(int angle) {
       }
   }
 
-void moveRadius() {
-  
+void moveRadius(int r) {
+    radius.moveTo(r);
+    while (radius.distanceToGo() > 0) {
+      radius.run();
+      }
   }
 
-void moveZ() {
-  
+void moveZ(int z) {
+    height.moveTo(z);
+    while (height.distanceToGo() > 0) {
+      height.run();
+      }
   }
 
 /**
