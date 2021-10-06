@@ -8,6 +8,7 @@
 #define encoderA 5
 #define encoderB 6
 #define encoderZ 7
+#define limitSwitchRadius 12
 
 byte slave_address = 7;
 long positions[2];
@@ -42,10 +43,12 @@ void setup() {
 
   pinMode(encoderA, INPUT_PULLUP);
   pinMode(encoderB, INPUT_PULLUP);
-  pinMode(encoderZ, INPUT_PULLUP);  
+  pinMode(encoderZ, INPUT_PULLUP);
+  pinMode(limitSwitchRadius, INPUT_PULLUP);
   enableInterrupt(encoderA, pulseA, RISING);
   enableInterrupt(encoderB, pulseB, RISING);
   enableInterrupt(encoderZ, pulseZ, RISING);
+  enableInterrupt(limitSwitchRadius, stopRadiusMotor, RISING);
 }
 
 void loop() {
@@ -142,4 +145,8 @@ void pulseB(){
 void pulseZ(){
   countA = 0;   //reset counters at "home" reference point
   countB = 0;
+}
+
+void stopRadiusMotor() {
+  radius.stop();  
 }
