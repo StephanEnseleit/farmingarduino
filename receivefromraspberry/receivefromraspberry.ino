@@ -15,7 +15,11 @@ long positions[2];
 int counter = 0;
 float encoderFactor = 2.7777;
 
-volatile int countA = 0;
+volatile in
+
+
+
+t countA = 0;
 volatile int countB = 0;
 volatile int cumulativeCountA = 0;
 volatile int cumulativeCountB = 0;
